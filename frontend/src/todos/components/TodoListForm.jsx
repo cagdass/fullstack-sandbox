@@ -80,7 +80,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 {index + 1}
               </Typography>
               <TextField
-                sx={{flexGrow: 1, marginTop: '1rem'}}
+                sx={{flexGrow: 1, marginTop: '1rem', width: '10rem' }}
                 label='What to do?'
                 value={todo.text}
                 onChange={event => {
@@ -92,7 +92,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 }}
               />
               <TextField
-                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: 220}}
+                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '5rem'}}
                 id="date"
                 label="Due date"
                 type="date"
@@ -106,7 +106,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 }}
               />
               <TextField
-                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: 150}}
+                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '1rem'}}
                 id="time"
                 label="Due time"
                 type="time"
@@ -120,7 +120,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 }}
               />
               <Typography
-                sx={{ marginLeft: '1rem' }}
+                sx={{ marginLeft: '1rem', width: '7rem' }}
                 variant="body2"
               >
                 {getTimeRemainingText(todo.dueDate, todo.dueTime)}
