@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography} from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -18,10 +18,9 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
   const [completedTodos, setCompletedTodos] = useState(todoList.completedTodos);
 
-  const handleSubmit = event => {
-    event.preventDefault()
+  useEffect(() => {
     saveTodoList(todoList.id, { todos, completedTodos })
-  }
+  }, [todos, completedTodos]);
 
   return (
     <Card sx={{margin: '0 1rem'}}>
@@ -29,7 +28,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
         <Typography component='h2'>
           {todoList.title}
         </Typography>
-        <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
+        <form style={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
           {todos.map((name, index) => (
             <div key={index} style={{display: 'flex', alignItems: 'center'}}>
               <Typography sx={{margin: '8px'}} variant='h6'>
@@ -112,9 +111,6 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               }}
             >
               Add Todo <AddIcon />
-            </Button>
-            <Button type='submit' variant='contained' color='primary'>
-              Save
             </Button>
           </CardActions>
         </form>
