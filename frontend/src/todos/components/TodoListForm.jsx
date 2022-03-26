@@ -14,6 +14,44 @@ const completedTodoTheme = createTheme({
   },
 });
 
+const getTomorrowsDate = () => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1) // Set to tomorrow's date
+  // Extract a string in the format 'YYYY-MM-DD':
+  return tomorrow.toISOString().split('T')[0];
+}
+
+// dueDate: 'YYYY-MM-DD', dueTime: 'HH:mm'
+const getTimeRemainingText = (dueDate, dueTime) => {
+  // Reconstruct a Date object from the arguments
+  const dueDateTime = new Date(`${dueDate}T${dueTime}`);
+  const diff = dueDateTime - new Date();
+  if (diff < 0) {
+    return 'Overdue';
+  } else if (diff >= 0) {
+    // time units in ms:
+    const second = 1000;
+    const minute = 60 * second;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+    const month = 30 * day; // roughly
+    const year = 12 * month; // roughly
+
+    const timeUnits = [['year', year], ['month', month], ['day', day], ['hour', hour], ['minute', minute], ['second', second]];
+
+    for (let i = 0; i + 1 < timeUnits.length; i++) {
+      if (Math.floor(diff / timeUnits[i][1]) > 0) {
+        const unitLeft1 = Math.floor(diff / timeUnits[i][1]);
+        const unitLeft2 = Math.floor((diff % timeUnits[i][1]) / timeUnits[i + 1][1]);
+        return `Due in ${unitLeft1} ${timeUnits[i][0]}s ${unitLeft2} ${timeUnits[i + 1][0]}s`;
+      }
+    }
+  }
+
+  return '';
+};
+
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
   const [completedTodos, setCompletedTodos] = useState(todoList.completedTodos);
@@ -29,7 +67,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
           {todoList.title}
         </Typography>
         <form style={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
-          {todos.map((name, index) => (
+          {todos.map((todo, index) => (
             <div key={index} style={{display: 'flex', alignItems: 'center'}}>
               <Typography sx={{margin: '8px'}} variant='h6'>
                 {index + 1}
@@ -37,15 +75,49 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               <TextField
                 sx={{flexGrow: 1, marginTop: '1rem'}}
                 label='What to do?'
-                value={name}
+                value={todo.text}
                 onChange={event => {
                   setTodos([ // immutable update
                     ...todos.slice(0, index),
-                    event.target.value,
+                    Object.assign({}, todos[index], { text: event.target.value }), // immutable update
                     ...todos.slice(index + 1)
                   ])
                 }}
               />
+              <TextField
+                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: 220}}
+                id="date"
+                label="Due date"
+                type="date"
+                defaultValue={getTomorrowsDate()}
+                onChange={event => {
+                  setTodos([ // immutable update
+                    ...todos.slice(0, index),
+                    Object.assign({}, todos[index], { dueDate: event.target.value }), // immutable update
+                    ...todos.slice(index + 1)
+                  ])
+                }}
+              />
+              <TextField
+                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: 150}}
+                id="time"
+                label="Due time"
+                type="time"
+                defaultValue="16:00"
+                onChange={event => {
+                  setTodos([ // immutable update
+                    ...todos.slice(0, index),
+                    Object.assign({}, todos[index], { dueTime: event.target.value }), // immutable update
+                    ...todos.slice(index + 1)
+                  ])
+                }}
+              />
+              <Typography
+                sx={{ marginLeft: '1rem' }}
+                variant="body2"
+              >
+                {getTimeRemainingText(todo.dueDate, todo.dueTime)}
+              </Typography>
               <Button
                 sx={{margin: '8px'}}
                 size="small"
@@ -107,7 +179,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               type='button'
               color='primary'
               onClick={() => {
-                setTodos([...todos, ''])
+                setTodos([...todos, { text: '', dueDate: getTomorrowsDate(), dueTime: '16:00' }])
               }}
             >
               Add Todo <AddIcon />
