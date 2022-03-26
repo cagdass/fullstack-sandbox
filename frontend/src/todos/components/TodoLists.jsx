@@ -6,20 +6,37 @@ import { TodoListForm } from './TodoListForm'
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const getPersonalTodos = () => {
-  return sleep(1000).then(() => Promise.resolve({
-    '0000000001': {
-      id: '0000000001',
-      title: 'First List',
-      todos: ['First todo of first list!'],
-      completedTodos: [],
-    },
-    '0000000002': {
-      id: '0000000002',
-      title: 'Second List',
-      todos: ['First todo of second list!'],
-      completedTodos: []
-    }
-  }))
+  return new Promise((resolve, reject) => {
+    fetch('http://localhost:3001/get_todos')
+      .then(res => res.json())
+      .then(
+        (result) => {
+          resolve(result);
+        },
+        (error) => {
+          reject([]);
+        }
+      )
+  });
+};
+
+const savePersonalTodo = (id, list) => {
+  return new Promise((resolve, reject) => {
+    fetch('http://localhost:3001/save_todo', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, list }),
+    })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          resolve(result);
+        },
+        (error) => {
+          reject([]);
+        }
+      )
+  });
 }
 
 export const TodoLists = ({ style }) => {
@@ -71,11 +88,14 @@ export const TodoLists = ({ style }) => {
       key={activeList} // use key to make React recreate component to reset internal state
       todoList={todoLists[activeList]}
       saveTodoList={(id, { todos, completedTodos }) => {
-        const listToUpdate = todoLists[id]
-        setTodoLists({
-          ...todoLists,
-          [id]: { ...listToUpdate, todos, completedTodos }
-        })
+        const listToUpdate = todoLists[id];
+        savePersonalTodo(id, { ...listToUpdate, todos, completedTodos })
+          .then(
+            setTodoLists({
+              ...todoLists,
+              [id]: { ...listToUpdate, todos, completedTodos }
+            })
+          );
       }}
     />}
   </Fragment>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography} from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -55,9 +55,16 @@ const getTimeRemainingText = (dueDate, dueTime) => {
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
   const [completedTodos, setCompletedTodos] = useState(todoList.completedTodos);
+  const notInitialRender = useRef(false)
 
   useEffect(() => {
-    saveTodoList(todoList.id, { todos, completedTodos })
+    // Save todo list if it's the first render of the component.
+    if (notInitialRender.current) {
+      saveTodoList(todoList.id, { todos, completedTodos })
+    } else {
+      // No longer the initial render:
+      notInitialRender.current = true;
+    }
   }, [todos, completedTodos]);
 
   return (
@@ -159,7 +166,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
           >
             Completed Todos
           </Typography>
-          {completedTodos.map((name, index) => (
+          {completedTodos.map((todo, index) => (
             <div
               key={index}
               style={{ display: 'flex', alignItems: 'center' }}
@@ -169,7 +176,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               </Typography>
               <ThemeProvider theme={completedTodoTheme}>
               <Typography sx={{margin: '8px'}} variant="body2">
-                  {name}
+                  {todo.text}
                 </Typography>
               </ThemeProvider>
             </div>
