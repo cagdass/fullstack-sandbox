@@ -1,14 +1,26 @@
 import React, { useState } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography} from '@mui/material'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
+import TaskIcon from '@mui/icons-material/Task'; // To mark a task complete.
+
+// In order to show completed todos' names in strikethrough.
+const completedTodoTheme = createTheme({
+  typography: {
+    body2: {
+      textDecoration: 'line-through',
+    },
+  },
+});
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
+  const [completedTodos, setCompletedTodos] = useState(todoList.completedTodos);
 
   const handleSubmit = event => {
     event.preventDefault()
-    saveTodoList(todoList.id, { todos })
+    saveTodoList(todoList.id, { todos, completedTodos })
   }
 
   return (
@@ -37,6 +49,25 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               />
               <Button
                 sx={{margin: '8px'}}
+                size="small"
+                color="secondary"
+                onClick={() => {
+                  // Add the todo to completed todos.
+                  setCompletedTodos([
+                    ...completedTodos,
+                    todos[index],
+                  ]);
+                  // Remove the todo from active todos.
+                  setTodos([
+                    ...todos.slice(0,index),
+                    ...todos.slice(index+1),
+                  ])
+                }}
+              >
+                <TaskIcon />
+              </Button>
+              <Button
+                sx={{margin: '8px'}}
                 size='small'
                 color='secondary'
                 onClick={() => {
@@ -48,6 +79,28 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               >
                 <DeleteIcon />
               </Button>
+            </div>
+          ))}
+          {/* Completed todos rendered below. Currently not possible to mark a todo back as incomplete. */}
+          <Typography
+            component='h3'
+            sx={{margin: '1rem 0'}}
+          >
+            Completed Todos
+          </Typography>
+          {completedTodos.map((name, index) => (
+            <div
+              key={index}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              <Typography sx={{margin: '8px'}} variant="body2">
+                {`${index + 1} -`}
+              </Typography>
+              <ThemeProvider theme={completedTodoTheme}>
+              <Typography sx={{margin: '8px'}} variant="body2">
+                  {name}
+                </Typography>
+              </ThemeProvider>
             </div>
           ))}
           <CardActions>

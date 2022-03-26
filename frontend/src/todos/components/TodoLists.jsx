@@ -10,12 +10,14 @@ const getPersonalTodos = () => {
     '0000000001': {
       id: '0000000001',
       title: 'First List',
-      todos: ['First todo of first list!']
+      todos: ['First todo of first list!'],
+      completedTodos: [],
     },
     '0000000002': {
       id: '0000000002',
       title: 'Second List',
-      todos: ['First todo of second list!']
+      todos: ['First todo of second list!'],
+      completedTodos: []
     }
   }))
 }
@@ -55,11 +57,11 @@ export const TodoLists = ({ style }) => {
     {todoLists[activeList] && <TodoListForm
       key={activeList} // use key to make React recreate component to reset internal state
       todoList={todoLists[activeList]}
-      saveTodoList={(id, { todos }) => {
+      saveTodoList={(id, { todos, completedTodos }) => {
         const listToUpdate = todoLists[id]
         setTodoLists({
           ...todoLists,
-          [id]: { ...listToUpdate, todos }
+          [id]: { ...listToUpdate, todos, completedTodos }
         })
       }}
     />}
