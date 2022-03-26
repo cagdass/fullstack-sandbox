@@ -41,16 +41,29 @@ export const TodoLists = ({ style }) => {
           My Todo Lists
         </Typography>
         <List>
-          {Object.keys(todoLists).map((key) => <ListItem
-            key={key}
-            button
-            onClick={() => setActiveList(key)}
-          >
-            <ListItemIcon>
-              <ReceiptIcon />
-            </ListItemIcon>
-            <ListItemText primary={todoLists[key].title} />
-          </ListItem>)}
+          {Object.keys(todoLists).map((key) => {
+            const todoList = todoLists[key];
+            const { todos = [], completedTodos = [] } = todoList;
+            let listTitleSx = {};
+            // No active todos in the list, but complete todo(s) exist(s).
+            // Set extra styling for such lists.
+            if (todos.length === 0 && completedTodos.length > 0) {
+              listTitleSx = { textDecoration: 'line-through' };
+            }
+
+            return (
+              <ListItem
+                key={key}
+                button
+                onClick={() => setActiveList(key)}
+              >
+                <ListItemIcon>
+                  <ReceiptIcon />
+                </ListItemIcon>
+                <ListItemText sx={listTitleSx} primary={todoList.title} />
+              </ListItem>
+              );
+          })}
         </List>
       </CardContent>
     </Card>
