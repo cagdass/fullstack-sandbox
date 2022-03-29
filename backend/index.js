@@ -31,8 +31,10 @@ app.post('/save_todo', (req, res) => {
     const { id = '', list = {} } = body;
     if (id !== '') {
         todos[id] = list;
+        res.status(200).send('Success');
+    } else {
+        res.status(200).send('Missing id');
     }
-    res.status(200).send('Success');
 });
 
 app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
