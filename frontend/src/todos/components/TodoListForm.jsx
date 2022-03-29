@@ -103,7 +103,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                   id="date"
                   label="Due date"
                   type="date"
-                  defaultValue={getTomorrowsDate()}
+                  defaultValue={todos[index].dueDate}
                   onChange={event => {
                     setTodos([ // immutable update
                       ...todos.slice(0, index),
@@ -117,7 +117,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                   id="time"
                   label="Due time"
                   type="time"
-                  defaultValue="16:00"
+                  defaultValue={todos[index].dueTime}
                   onChange={event => {
                     setTodos([ // immutable update
                       ...todos.slice(0, index),
