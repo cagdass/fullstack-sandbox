@@ -5,39 +5,21 @@ import { TodoListForm } from './TodoListForm'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const getPersonalTodos = () => {
-  return new Promise((resolve, reject) => {
+const getPersonalTodos = () => (
     fetch('http://localhost:3001/get_todos')
       .then(res => res.json())
-      .then(
-        (result) => {
-          resolve(result);
-        },
-        (error) => {
-          reject([]);
-        }
-      )
-  });
-};
+  );
 
-const savePersonalTodo = (id, list) => {
-  return new Promise((resolve, reject) => {
-    fetch('http://localhost:3001/save_todo', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, list }),
-    })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          resolve(result);
-        },
-        (error) => {
-          reject([]);
-        }
-      )
-  });
-}
+const savePersonalTodo = (id, list) => (
+  fetch('http://localhost:3001/save_todo', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, list }),
+  })
+    .then(res =>
+      res.json()
+    )
+);
 
 export const TodoLists = ({ style }) => {
   const [todoLists, setTodoLists] = useState({})
