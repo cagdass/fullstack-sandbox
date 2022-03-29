@@ -29,9 +29,9 @@ app.post('/save_todo', (req, res) => {
     const { id = '', list = {} } = body;
     if (id !== '') {
         todos[id] = list;
-        res.status(200).send('Success');
+        res.status(200).send({ result: 'success' });
     } else {
-        res.status(200).send('Missing id');
+        res.status(200).send({ result: 'error', reason: 'Missing id' });
     }
 });
 
