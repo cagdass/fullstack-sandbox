@@ -21,6 +21,10 @@ const savePersonalTodo = (id, list) => (
     )
 );
 
+const isListCompleted = list => {
+  return list.todos.every(todo => todo.completed);
+};
+
 export const TodoLists = ({ style }) => {
   const [todoLists, setTodoLists] = useState({})
   const [activeList, setActiveList] = useState()
@@ -42,12 +46,6 @@ export const TodoLists = ({ style }) => {
         <List>
           {Object.keys(todoLists).map((key) => {
             const todoList = todoLists[key];
-            const { todos = []  } = todoList;
-            let listTitleSx = {};
-            // Set extra styling when all todos are completed.
-            if (todos.length > 0 && todos.filter(todo => !todo.completed).length === 0) {
-              listTitleSx = { textDecoration: 'line-through' };
-            }
 
             return (
               <ListItem
@@ -58,7 +56,10 @@ export const TodoLists = ({ style }) => {
                 <ListItemIcon>
                   <ReceiptIcon />
                 </ListItemIcon>
-                <ListItemText sx={listTitleSx} primary={todoList.title} />
+                <ListItemText
+                  sx={isListCompleted(todoList) ? { textDecoration: 'line-through' } : {} }
+                  primary={todoList.title}
+                />
               </ListItem>
               );
           })}
