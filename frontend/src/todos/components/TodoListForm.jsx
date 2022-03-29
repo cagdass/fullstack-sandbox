@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { Fragment, useState, useEffect, useRef } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography} from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -54,18 +54,17 @@ const getTimeRemainingText = (dueDate, dueTime) => {
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
-  const [completedTodos, setCompletedTodos] = useState(todoList.completedTodos);
   const notInitialRender = useRef(false)
 
   useEffect(() => {
     // Save todo list if it's the first render of the component.
     if (notInitialRender.current) {
-      saveTodoList(todoList.id, { todos, completedTodos })
+      saveTodoList(todoList.id, { todos })
     } else {
       // No longer the initial render:
       notInitialRender.current = true;
     }
-  }, [todos, completedTodos]);
+  }, [todos]);
 
   return (
     <Card sx={{margin: '0 1rem'}}>
@@ -74,91 +73,96 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
           {todoList.title}
         </Typography>
         <form style={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
-          {todos.map((todo, index) => (
-            <div key={index} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography sx={{margin: '8px'}} variant='h6'>
-                {index + 1}
-              </Typography>
-              <TextField
-                sx={{flexGrow: 1, marginTop: '1rem', width: '10rem' }}
-                label='What to do?'
-                value={todo.text}
-                onChange={event => {
-                  setTodos([ // immutable update
-                    ...todos.slice(0, index),
-                    Object.assign({}, todos[index], { text: event.target.value }), // immutable update
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-              />
-              <TextField
-                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '5rem'}}
-                id="date"
-                label="Due date"
-                type="date"
-                defaultValue={getTomorrowsDate()}
-                onChange={event => {
-                  setTodos([ // immutable update
-                    ...todos.slice(0, index),
-                    Object.assign({}, todos[index], { dueDate: event.target.value }), // immutable update
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-              />
-              <TextField
-                sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '1rem'}}
-                id="time"
-                label="Due time"
-                type="time"
-                defaultValue="16:00"
-                onChange={event => {
-                  setTodos([ // immutable update
-                    ...todos.slice(0, index),
-                    Object.assign({}, todos[index], { dueTime: event.target.value }), // immutable update
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-              />
-              <Typography
-                sx={{ marginLeft: '1rem', width: '7rem' }}
-                variant="body2"
-              >
-                {getTimeRemainingText(todo.dueDate, todo.dueTime)}
-              </Typography>
-              <Button
-                sx={{margin: '8px'}}
-                size="small"
-                color="secondary"
-                onClick={() => {
-                  // Add the todo to completed todos.
-                  setCompletedTodos([
-                    ...completedTodos,
-                    todos[index],
-                  ]);
-                  // Remove the todo from active todos.
-                  setTodos([
-                    ...todos.slice(0,index),
-                    ...todos.slice(index+1),
-                  ])
-                }}
-              >
-                <TaskIcon />
-              </Button>
-              <Button
-                sx={{margin: '8px'}}
-                size='small'
-                color='secondary'
-                onClick={() => {
-                  setTodos([ // immutable delete
-                    ...todos.slice(0, index),
-                    ...todos.slice(index + 1)
-                  ])
-                }}
-              >
-                <DeleteIcon />
-              </Button>
-            </div>
-          ))}
+          {/* Only render incomplete todos here, complete ones are rendered separately */}
+          {todos.map((todo, index) => {
+            if (todo.completed) {
+              return (
+                <Fragment />
+              );
+            }
+
+            return (
+              <div key={index} style={{display: 'flex', alignItems: 'center'}}>
+                <Typography sx={{margin: '8px'}} variant='h6'>
+                  {index + 1}
+                </Typography>
+                <TextField
+                  sx={{flexGrow: 1, marginTop: '1rem', width: '10rem' }}
+                  label='What to do?'
+                  value={todo.text}
+                  onChange={event => {
+                    setTodos([ // immutable update
+                      ...todos.slice(0, index),
+                      Object.assign({}, todos[index], { text: event.target.value }), // immutable update
+                      ...todos.slice(index + 1)
+                    ])
+                  }}
+                />
+                <TextField
+                  sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '5rem'}}
+                  id="date"
+                  label="Due date"
+                  type="date"
+                  defaultValue={getTomorrowsDate()}
+                  onChange={event => {
+                    setTodos([ // immutable update
+                      ...todos.slice(0, index),
+                      Object.assign({}, todos[index], { dueDate: event.target.value }), // immutable update
+                      ...todos.slice(index + 1)
+                    ])
+                  }}
+                />
+                <TextField
+                  sx={{flexGrow: 1, marginLeft: '1rem', marginTop: '1rem', width: '1rem'}}
+                  id="time"
+                  label="Due time"
+                  type="time"
+                  defaultValue="16:00"
+                  onChange={event => {
+                    setTodos([ // immutable update
+                      ...todos.slice(0, index),
+                      Object.assign({}, todos[index], { dueTime: event.target.value }), // immutable update
+                      ...todos.slice(index + 1)
+                    ])
+                  }}
+                />
+                <Typography
+                  sx={{ marginLeft: '1rem', width: '7rem' }}
+                  variant="body2"
+                >
+                  {getTimeRemainingText(todo.dueDate, todo.dueTime)}
+                </Typography>
+                <Button
+                  sx={{margin: '8px'}}
+                  size="small"
+                  color="secondary"
+                  onClick={() => {
+                    // Add the todo to completed todos.
+                    setTodos([
+                      ...todos.slice(0, index),
+                      Object.assign({}, todos[index], { completed: true }),
+                      ...todos.slice(index + 1),
+                    ]);
+                  }}
+                >
+                  <TaskIcon />
+                </Button>
+                <Button
+                  sx={{margin: '8px'}}
+                  size='small'
+                  color='secondary'
+                  onClick={() => {
+                    setTodos([ // immutable delete
+                      ...todos.slice(0, index),
+                      ...todos.slice(index + 1)
+                    ])
+                  }}
+                >
+                  <DeleteIcon />
+                </Button>
+              </div>
+            );
+          })}
           {/* Completed todos rendered below. Currently not possible to mark a todo back as incomplete. */}
           <Typography
             component='h3'
@@ -166,7 +170,8 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
           >
             Completed Todos
           </Typography>
-          {completedTodos.map((todo, index) => (
+          {/* Render only completed todos, filter first and then map */}
+          {todos.filter(todo => todo.completed).map((todo, index) => (
             <div
               key={index}
               style={{ display: 'flex', alignItems: 'center' }}

@@ -60,11 +60,10 @@ export const TodoLists = ({ style }) => {
         <List>
           {Object.keys(todoLists).map((key) => {
             const todoList = todoLists[key];
-            const { todos = [], completedTodos = [] } = todoList;
+            const { todos = []  } = todoList;
             let listTitleSx = {};
-            // No active todos in the list, but complete todo(s) exist(s).
-            // Set extra styling for such lists.
-            if (todos.length === 0 && completedTodos.length > 0) {
+            // Set extra styling when all todos are completed.
+            if (todos.length > 0 && todos.filter(todo => !todo.completed).length === 0) {
               listTitleSx = { textDecoration: 'line-through' };
             }
 
@@ -87,13 +86,13 @@ export const TodoLists = ({ style }) => {
     {todoLists[activeList] && <TodoListForm
       key={activeList} // use key to make React recreate component to reset internal state
       todoList={todoLists[activeList]}
-      saveTodoList={(id, { todos, completedTodos }) => {
+      saveTodoList={(id, { todos }) => {
         const listToUpdate = todoLists[id];
-        savePersonalTodo(id, { ...listToUpdate, todos, completedTodos })
+        savePersonalTodo(id, { ...listToUpdate, todos })
           .then(
             setTodoLists({
               ...todoLists,
-              [id]: { ...listToUpdate, todos, completedTodos }
+              [id]: { ...listToUpdate, todos }
             })
           );
       }}
